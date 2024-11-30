@@ -28,12 +28,11 @@ class UserRegister(SQLModel):
     checkPassword: Optional[str] = Field(min_length=8, max_length=128, nullable=False)
 
     @field_validator("checkPassword")
-    def passwords_match(cls, checkPassword, info):
-        # 从 ValidationInfo 中获取 userPassword 的值
-        userPassword = info.data.get("userPassword")
-        if userPassword != checkPassword:
+    def passwords_match(cls, check_password, info):
+        user_password = info.data.get("userPassword")
+        if user_password != check_password:
             raise ValueError("两次输入的密码不一致")
-        return checkPassword
+        return check_password
 
 
 class UserLogin(SQLModel):

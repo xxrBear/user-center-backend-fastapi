@@ -10,9 +10,6 @@ router = APIRouter()
 @router.post('/register', response_model=UserPublic)
 async def register(session: SessionDep, user_register: UserRegister):
     """ 用户注册
-    :param session: 依赖
-    :param user_register: 模型
-    :return: user_id 用户ID
     """
     db_obj = UserRegister.model_validate(user_register)
     user_obj = User(**db_obj.model_dump())
@@ -25,11 +22,7 @@ async def register(session: SessionDep, user_register: UserRegister):
 
 @router.post('/login')
 async def login(session: SessionDep, user_login: UserLogin, request: Request):
-    """
-    :param session:
-    :param user_login:
-    :param request:
-    :return:
+    """ 用户登录
     """
     user_obj = User.model_validate(user_login)
     user_obj = session.exec(select(User).where(User.userAccount == user_obj.userAccount)).first()
@@ -45,10 +38,7 @@ async def login(session: SessionDep, user_login: UserLogin, request: Request):
 
 @router.get('/current')
 async def current(session: SessionDep, request: Request):
-    """
-    :param session:
-    :param request:
-    :return:
+    """ 获取当前登录用户
     """
     user_id = request.session.get('userLoginState')
     user_obj = session.exec(select(User).where(User.id == user_id)).one()
