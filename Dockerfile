@@ -10,7 +10,7 @@ COPY . /app
 # 安装项目依赖 (如果有 requirements.txt 文件)
 RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
-# 暴露容器的 8000 端口 (根据需求修改)
+# 暴露容器的 8080 端口 (根据需求修改)
 EXPOSE 8080
 
 # 默认启动命令
