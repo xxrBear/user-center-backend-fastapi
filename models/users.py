@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
-from pydantic import field_validator
+from pydantic import field_validator, BaseModel
 from sqlmodel import SQLModel, Field
 
 
-class UserBase(SQLModel):  # 使用 table=True 将其注册为数据库表
+class UserBase(SQLModel):
     id: Optional[int] = Field(default=None, primary_key=True, index=True, description="用户ID")
     username: Optional[str] = Field(default=None, max_length=256, description="用户昵称")
     userAccount: Optional[str] = Field(default=None, max_length=256, description="账号", unique=True)
@@ -45,12 +45,27 @@ class User(UserBase, table=True):
 
 
 class UserPublic(SQLModel):
-    code: int = Field(default=0, description="响应状态码")
-    data: int | None = None
+    """ 用户数据脱敏
+    """
+    id: Optional[int] = Field(default=None, primary_key=True, index=True, description="用户ID")
+    username: Optional[str] = Field(default=None, max_length=256, description="用户昵称")
+    userAccount: Optional[str] = Field(default=None, max_length=256, description="账号", unique=True)
+    avatarUrl: Optional[str] = Field(default=None, max_length=1024, description="用户头像")
+    gender: Optional[int] = Field(default=None, description="性别")
+    phone: Optional[str] = Field(default=None, max_length=128, description="电话")
+    email: Optional[str] = Field(default=None, max_length=512, description="邮箱")
+    createTime: Optional[datetime] = Field(default_factory=datetime.now, description="创建时间")
+    userRole: int = Field(default=0, description="用户角色 0 - 普通用户 1 - 管理员")
+    planetCode: Optional[str] = Field(default=None, max_length=512, description="星球编号")
+    userStatus: int = Field(default=0, description="状态 0 - 正常")
+
+
+class UserSearch(SQLModel):
+    userAccount: Optional[str] = Field(min_length=4, max_length=255, nullable=False)
+
+
+class CustomerResponse(BaseModel):
+    code: int | None = None
     message: str | None = None
     description: str | None = None
-
-
-class UsersPublic(SQLModel):
-    data: list[UserPublic]
-    count: int
+    data: List[UserPublic] | UserPublic | None = None

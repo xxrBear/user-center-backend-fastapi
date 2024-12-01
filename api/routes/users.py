@@ -1,63 +1,46 @@
 from fastapi import APIRouter, Request
 from sqlmodel import select
 
-from models.users import UserRegister, UserLogin, User, UserPublic
+from models.users import UserRegister, UserLogin, User, UserPublic, CustomerResponse, UserSearch
 from api.deps import SessionDep
+from core import crud
 
 router = APIRouter()
 
 
-@router.post('/register', response_model=UserPublic)
+@router.post('/register', response_model=CustomerResponse)
 async def register(session: SessionDep, user_register: UserRegister):
     """ 用户注册
     """
-    db_obj = UserRegister.model_validate(user_register)
-    user_obj = User(**db_obj.model_dump())
-    session.add(user_obj)
-    session.commit()
-    session.refresh(user_obj)
-    json_data = {'code': 0, 'message': 'message', 'description': 'description', 'data': user_obj.id}
-    return UserPublic(**json_data)
+    response = crud.create_user(session, user_register)
+    return response
 
 
 @router.post('/login')
 async def login(session: SessionDep, user_login: UserLogin, request: Request):
     """ 用户登录
     """
-    user_obj = User.model_validate(user_login)
-    user_obj = session.exec(select(User).where(User.userAccount == user_obj.userAccount)).first()
-    if user_obj:
-        request.session.setdefault('userLoginState', user_obj.id)
-        return {
-            'code': 0,
-            'data': user_obj.id,
-            'message': 'message',
-            'description': 'description',
-        }
+    response = crud.login(session, user_login, request)
+    return response
 
 
-@router.get('/current')
-async def current(session: SessionDep, request: Request):
+@router.get('/current', response_model=CustomerResponse)
+async def current(request: Request):
     """ 获取当前登录用户
     """
-    user_id = request.session.get('userLoginState')
-    user_obj = session.exec(select(User).where(User.id == user_id)).one()
-
-    return {
-        'code': 0,
-        'data': user_obj,
-        'message': 'message',
-        'description': 'description',
-    }
+    response = crud.get_active_user(request)
+    return response
 
 
-@router.get('/search')
-async def search(session: SessionDep, request: Request):
-    user_obj = session.exec(select(User)).all()
+@router.get('/search', response_model=CustomerResponse)
+async def search(session: SessionDep, request: Request, username: str | None = None):
+    response = crud.search_user(session, request, username)
+    return response
 
-    return {
-        'code': 0,
-        'data': user_obj,
-        'message': 'message',
-        'description': 'description',
-    }
+
+@router.post('/logout')
+async def login(request: Request):
+    """ 用户注销
+    """
+    response = crud.logout(request)
+    return response
