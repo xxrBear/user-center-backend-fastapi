@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from sqlmodel import select
 
-from models.users import UserRegister, UserLogin, User, UserPublic, CustomerResponse, UserSearch
+from models.users import UserRegister, UserLogin, User, UserPublic, CustomerResponse
 from api.deps import SessionDep
 from core import crud
 
@@ -33,8 +33,8 @@ async def current(request: Request):
 
 
 @router.get('/search', response_model=CustomerResponse)
-async def search(session: SessionDep, request: Request, username: str | None = None):
-    response = crud.search_user(session, request, username)
+async def search(session: SessionDep, request: Request):
+    response = crud.search_user(session, request)
     return response
 
 
