@@ -22,6 +22,10 @@ class UserBase(SQLModel):
     planetCode: Optional[str] = Field(default=None, max_length=512, description="星球编号")
 
 
+class User(UserBase, table=True):
+    pass
+
+
 class UserRegister(SQLModel):
     userAccount: Optional[str] = Field(min_length=4, max_length=255, nullable=False)
     userPassword: Optional[str] = Field(min_length=8, max_length=128, nullable=False)
@@ -40,10 +44,6 @@ class UserLogin(SQLModel):
     userPassword: Optional[str] = Field(min_length=8, max_length=128, nullable=False)
 
 
-class User(UserBase, table=True):
-    pass
-
-
 class UserPublic(SQLModel):
     """ 用户数据脱敏
     """
@@ -58,10 +58,6 @@ class UserPublic(SQLModel):
     userRole: int = Field(default=0, description="用户角色 0 - 普通用户 1 - 管理员")
     planetCode: Optional[str] = Field(default=None, max_length=512, description="星球编号")
     userStatus: int = Field(default=0, description="状态 0 - 正常")
-
-
-class UserSearch(SQLModel):
-    userAccount: Optional[str] = Field(min_length=4, max_length=255, nullable=False)
 
 
 class CustomerResponse(BaseModel):
