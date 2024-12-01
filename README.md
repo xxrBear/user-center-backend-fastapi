@@ -10,3 +10,9 @@
 docker build -t user-center .
 docker run -d -p 8080:8080 user-center
 ```
+
+## 在线使用
+```shell
+账号: admin
+密码: admin123
+```
