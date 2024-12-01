@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request
-from sqlmodel import select
 
-from models.users import UserRegister, UserLogin, User, UserPublic, CustomerResponse
+from models.users import UserRegister, UserLogin, CustomerResponse
 from api.deps import SessionDep
 from core import crud
 

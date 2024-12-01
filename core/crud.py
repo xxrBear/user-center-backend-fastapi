@@ -3,13 +3,14 @@ import re
 from fastapi import Request
 from sqlmodel import Session, select
 from fastapi.encoders import jsonable_encoder
+from starlette.responses import JSONResponse
 
 from core import security, status_code
 from core.exceptions import CustomException
 from models.users import UserRegister, User, UserPublic, UserLogin, CustomerResponse
 
 
-def create_user(session: Session, user_register: UserRegister) -> CustomerResponse:
+def create_user(session: Session, user_register: UserRegister) -> JSONResponse:
     # md5 加密密码
     hashed_password = security.encrypt_with_md5(user_register.userPassword)
 
@@ -22,6 +23,11 @@ def create_user(session: Session, user_register: UserRegister) -> CustomerRespon
     username = session.exec(statement).first()
     if username:
         raise CustomException(status_code.USER_EXISTS, '用户名已存在！')
+
+    statement = select(User).where(User.planetCode == user_register.planetCode)
+    username = session.exec(statement).first()
+    if username:
+        raise CustomException(status_code.PLANT_CODE_EXISTS, '星球编号已存在！')
 
     # 创建一个 User 对象
     db_user = User.model_validate(user_register, update={"userPassword": hashed_password})

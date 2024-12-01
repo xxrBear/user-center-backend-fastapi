@@ -4,6 +4,9 @@ from datetime import datetime
 from pydantic import field_validator, BaseModel
 from sqlmodel import SQLModel, Field
 
+from core.exceptions import CustomException
+from core import status_code
+
 
 class UserBase(SQLModel):
     id: Optional[int] = Field(default=None, primary_key=True, index=True, description="用户ID")
@@ -30,12 +33,13 @@ class UserRegister(SQLModel):
     userAccount: Optional[str] = Field(min_length=4, max_length=255, nullable=False)
     userPassword: Optional[str] = Field(min_length=8, max_length=128, nullable=False)
     checkPassword: Optional[str] = Field(min_length=8, max_length=128, nullable=False)
+    planetCode: Optional[str] = Field(max_length=128, description="星球编号")
 
     @field_validator("checkPassword")
     def passwords_match(cls, check_password, info):
         user_password = info.data.get("userPassword")
         if user_password != check_password:
-            raise ValueError("两次输入的密码不一致")
+            raise CustomException(status_code.PARAMS_ERROR, "两次输入的密码不一致")
         return check_password
 
 
