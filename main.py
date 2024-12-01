@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 from api.main import api_router
 from core.exceptions import CustomException
@@ -9,6 +10,14 @@ from core.exceptions import CustomException
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="your-secret-key")
 app.include_router(api_router)
+# 允许所有来源
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源
+    allow_credentials=True,  # 允许携带 cookies
+    allow_methods=["*"],  # 允许所有 HTTP 方法
+    allow_headers=["*"],  # 允许所有请求头
+)
 
 
 @app.exception_handler(CustomException)
