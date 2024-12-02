@@ -46,7 +46,7 @@ def login(session: Session, user_login: UserLogin, request: Request) -> Customer
     statement = select(User).where(User.userAccount == user_login.userAccount, User.userPassword == hashed_password)
     user_obj = session.exec(statement).first()
     if not user_obj:
-        raise CustomException(status_code.LOGGI_ERROR, '用户名或密码错误！')
+        raise CustomException(status_code.LOGIN_ERROR, '用户名或密码错误！')
 
     user_public = UserPublic(**user_obj.model_dump())
     request.session['userLoginState'] = jsonable_encoder(user_public)
@@ -63,6 +63,9 @@ def logout(request: Request) -> CustomerResponse:
 
 def get_active_user(request: Request) -> CustomerResponse:
     user_obj = request.session.get('userLoginState')
+
+    if not user_obj:
+        raise CustomException(status_code.NOT_LOGIN, '用户未登录！')
 
     return CustomerResponse(**{
         'code': 0,
