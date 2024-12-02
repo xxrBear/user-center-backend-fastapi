@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from api.main import api_router
 from core.exceptions import CustomException
+from core.init_db import init_db_and_superuser
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="your-secret-key")
@@ -18,6 +19,12 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有 HTTP 方法
     allow_headers=["*"],  # 允许所有请求头
 )
+
+
+# FastAPI 启动时初始化数据库
+@app.on_event("startup")
+def startup():
+    init_db_and_superuser()
 
 
 @app.exception_handler(CustomException)

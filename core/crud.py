@@ -49,8 +49,8 @@ def login(session: Session, user_login: UserLogin, request: Request) -> Customer
         raise CustomException(status_code.LOGGI_ERROR, '用户名或密码错误！')
 
     user_public = UserPublic(**user_obj.model_dump())
-    request.session.setdefault('userLoginState', jsonable_encoder(user_public))
-    json_data = {'code': 0, 'message': 'ok', 'description': '登录成功！', 'data': user_public}
+    request.session['userLoginState'] = jsonable_encoder(user_public)
+    json_data = {'code': 0, 'message': 'ok', 'description': '登录成功！', 'data': jsonable_encoder(user_public)}
 
     return CustomerResponse(**json_data)
 
